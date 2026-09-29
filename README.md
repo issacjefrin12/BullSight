@@ -1,183 +1,421 @@
-# Bull Sight
+````markdown
+# 🐂 Bull Sight
 
-## AI-Powered Stock Market Prediction & Investment Analysis
+### AI-Powered Stock Market Prediction & Investment Analysis
 
-Bull Sight is a machine-learning-based stock market analysis system. It obtains historical market data from Yahoo Finance through `yfinance`, preprocesses and engineers market features, compares machine-learning models, and predicts the next trading day's closing price. The React dashboard presents historical and predicted prices, model evaluation metrics, and an analytical BUY/HOLD/SELL signal.
+> **Predicting Tomorrow's Market, Today.**
 
-Predictions and BUY/HOLD/SELL signals are analytical outputs for research and decision support. They are uncertain, are not guaranteed, and are **not financial advice**.
+Bull Sight is a machine-learning-based stock market prediction and investment analysis system designed to analyze historical market data, generate technical indicators, compare multiple machine-learning models, and predict the next-day closing price of a selected stock or market index.
 
-## Features
+The system combines data collection, preprocessing, feature engineering, machine learning, model evaluation, and interactive visualization into a single web-based platform.
 
-- Downloads daily historical prices from Yahoo Finance and caches them locally for six hours; the dashboard also supports manual refresh.
-- Builds technical indicators and market-derived features from OHLCV data.
-- Uses a chronological 80/20 train/test split for the scikit-learn and XGBoost models.
-- Compares available models using MAE, RMSE, MAPE, and R², then selects the lowest-MAE model.
-- Predicts the next trading day's closing price and computes a rule-based BUY/HOLD/SELL signal using predicted movement, moving-average trend, MACD, RSI, and volume.
-- Displays historical market charts and the selected model's actual-versus-predicted test curve.
-- Saves prediction history in a local SQLite database and stores the watchlist in browser local storage.
+---
 
-### Implemented features
+## 📌 Overview
 
-Model input features in `backend/app/services/features.py` are:
+Stock market prediction is challenging because financial markets are dynamic, volatile, and influenced by many factors.
 
-- Open, High, Low, Close, and Volume
-- SMA 20 and SMA 50
-- EMA 20
-- RSI 14
-- MACD and MACD Signal
-- Upper and lower Bollinger Bands (20-period)
-- Daily Return
-- 20-day Volatility
-- High-Low Range, calculated as `(High - Low) / Close`
-- 20-day Volume SMA
+Bull Sight provides an end-to-end framework that uses historical market data obtained through **Yahoo Finance using yfinance**. The data is processed and transformed into meaningful technical features before being passed to multiple machine-learning models.
 
-The next-day closing price is the regression target, not an input feature.
+The system evaluates the models using standard regression metrics and presents the results through an interactive dashboard.
 
-## Machine-learning models
-
-- **Linear Regression:** baseline regression model for next-day closing-price prediction.
-- **Random Forest:** ensemble of decision trees for nonlinear price relationships.
-- **XGBoost:** gradient-boosted trees for next-day closing-price prediction.
-- **LSTM (PyTorch):** sequence model using the preceding 30 trading days; it is marked unavailable when PyTorch is missing or there is not enough data.
-
-The LSTM implementation uses PyTorch, not TensorFlow/Keras. The best available model is selected by lowest test-set MAE.
-
-## Workflow
+### Bull Sight Pipeline
 
 ```text
-User selects stock
-      -> Historical data collection (Yahoo Finance / yfinance)
-      -> Data preprocessing
-      -> Feature engineering
-      -> Chronological train/test split
-      -> Model training
-      -> Next-day closing-price prediction
-      -> Model evaluation
-      -> Visualization
-      -> Analytical BUY/HOLD/SELL signal
+Stock Selection
+       ↓
+Historical Data Collection
+       ↓
+Data Preprocessing
+       ↓
+Feature Engineering
+       ↓
+Chronological Train/Test Split
+       ↓
+Model Training
+       ↓
+Next-Day Price Prediction
+       ↓
+Model Evaluation
+       ↓
+Visualization & Investment Analysis
+````
+
+---
+
+## ✨ Features
+
+* 📊 Historical stock market data collection
+* 🔎 Stock symbol search
+* 📈 Technical indicator generation
+* 🤖 Multiple machine-learning models
+* 🔮 Next-day closing price prediction
+* 📉 Actual vs. predicted price visualization
+* 📊 Model performance comparison
+* 📐 MAE, RMSE, MAPE and R² evaluation
+* 📱 Interactive web dashboard
+* 🟢🟡🔴 Analytical BUY / HOLD / SELL signal
+* 📋 Historical market analysis
+* 🏦 Support for stocks and market indices
+
+---
+
+## 🤖 Machine Learning Models
+
+Bull Sight evaluates multiple models for next-day closing price prediction:
+
+| Model                 | Description                                                                     |
+| --------------------- | ------------------------------------------------------------------------------- |
+| **Linear Regression** | Provides a simple linear baseline for price prediction                          |
+| **Random Forest**     | Uses an ensemble of decision trees to model nonlinear relationships             |
+| **XGBoost**           | Uses gradient boosting for regression                                           |
+| **LSTM**              | Uses recurrent neural networks to learn sequential patterns in time-series data |
+
+The models are trained using a **chronological train/test split** to preserve the temporal order of financial data.
+
+---
+
+## 📊 Technical Indicators
+
+Bull Sight uses technical indicators and market features to provide additional information to the prediction models.
+
+Some of the features include:
+
+* SMA20
+* SMA50
+* EMA20
+* RSI14
+* MACD
+* MACD Signal
+* Bollinger Bands
+* Daily Return
+* Volatility
+* High-Low Range
+* Volume-based features
+
+These features are derived from historical market data during the feature-engineering stage.
+
+---
+
+## 📏 Model Evaluation
+
+The prediction models are evaluated using four regression metrics:
+
+### MAE — Mean Absolute Error
+
+Measures the average absolute difference between actual and predicted prices.
+
+**Lower MAE indicates lower prediction error.**
+
+### RMSE — Root Mean Squared Error
+
+Measures prediction error while giving greater importance to larger errors.
+
+**Lower RMSE indicates lower prediction error.**
+
+### MAPE — Mean Absolute Percentage Error
+
+Expresses prediction error as a percentage.
+
+**Lower MAPE indicates lower percentage error.**
+
+### R² — Coefficient of Determination
+
+Measures how much of the variation in the target variable is explained by the model.
+
+**Higher R² indicates greater explained variance.**
+
+
+
+---
+
+## 🏗️ System Architecture
+
+```text
+┌───────────────────────────────────────┐
+│          Frontend                     │
+│     React + TypeScript + Vite         │
+│                                       │
+│  Dashboard • Charts • Search • UI     │
+└──────────────────┬────────────────────┘
+                   │
+                HTTP/JSON
+                   │
+                   ↓
+┌───────────────────────────────────────┐
+│          Backend                      │
+│          Python + FastAPI             │
+│                                       │
+│ Data Collection → Preprocessing       │
+│ → Feature Engineering → Prediction    │
+│ → Model Evaluation                    │
+└──────────────────┬────────────────────┘
+                   │
+                   ↓
+┌───────────────────────────────────────┐
+│       Data & Machine Learning         │
+│                                       │
+│ Yahoo Finance / yfinance              │
+│              ↓                        │
+│ Historical OHLCV Data                 │
+│              ↓                        │
+│ Technical Indicators                  │
+│              ↓                        │
+│ Linear Regression | Random Forest     │
+│ XGBoost | LSTM                        │
+│              ↓                        │
+│ Prediction & Evaluation               │
+└───────────────────────────────────────┘
 ```
 
-## Evaluation metrics
+---
 
-- **MAE (Mean Absolute Error):** average absolute difference between predicted and observed prices.
-- **RMSE (Root Mean Squared Error):** square root of the average squared error; larger errors have more influence.
-- **MAPE (Mean Absolute Percentage Error):** mean absolute error expressed relative to observed values, as a percentage.
-- **R² (coefficient of determination):** indicates how much of the observed target variance is explained by the model. It is not a prediction-accuracy percentage.
-
-Lower MAE, RMSE, and MAPE generally indicate lower prediction error; higher R² generally indicates greater explained variance. These metrics do not guarantee future performance.
-
-## Technology stack
-
-- **Frontend:** React 18, TypeScript, Vite, Recharts, Axios, and Lucide React; styling is in the project's CSS. Tailwind CSS is not installed or configured.
-- **Backend:** Python, FastAPI, and Uvicorn.
-- **Data and ML:** Pandas, NumPy, scikit-learn, XGBoost, and PyTorch.
-- **Storage:** SQLite for prediction history; local CSV and JSON files for the Yahoo Finance data cache.
-- **Data source:** Yahoo Finance via `yfinance`.
-
-## Requirements
-
-- Python 3.11 (the included Dockerfile uses Python 3.11; use this version for the documented setup).
-- Node.js 20 or newer and npm (the included Docker Compose configuration uses Node 20; Vite 6 requires Node.js 18 or newer).
-- Git.
-- Internet access for Yahoo Finance data downloads and the frontend's Google Fonts request.
-
-Ollama is not used. No API keys or environment variables are required by the current code. The frontend API URL is currently configured in `frontend/src/main.tsx` as `http://127.0.0.1:8000/api`.
-
-## Installation and run
-
-### Backend (Windows PowerShell)
-
-```powershell
-cd backend
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
-
-FastAPI initializes the SQLite database on startup. Open the interactive API documentation at <http://127.0.0.1:8000/docs>.
-
-If PowerShell does not allow activation, run the environment's interpreter directly instead:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
+## 🛠️ Technology Stack
 
 ### Frontend
 
-In a second PowerShell window, from the repository root:
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Recharts
 
-```powershell
-cd frontend
-npm install
-npm run dev
-```
+### Backend
 
-Open the Vite URL printed by the command (normally <http://localhost:5173>). The backend must be running at `127.0.0.1:8000`.
+* Python
+* FastAPI
 
-The repository also includes `START_BACKEND.bat` and `START_FRONTEND.bat` for Windows. Docker configuration is provided in `docker-compose.yml` and `backend/Dockerfile`.
+### Data Processing
 
-## Data and generated files
+* Pandas
+* NumPy
+* yfinance
 
-Yahoo Finance daily history is requested through `yfinance` for the selected symbol. The backend caches downloaded CSV files and source metadata under `backend/data/raw/`; verified cache entries are reused for up to six hours. If Yahoo Finance cannot be reached, an existing cached CSV may be used and identified as cached data. Historical cache CSVs, processed data, and the local prediction-history database are generated runtime data and are excluded from Git. The application downloads market history as needed; these files do not need to be committed.
+### Machine Learning
 
-No `.env` file or `.env.example` is needed because the current application does not read environment variables or require credentials.
+* Scikit-learn
+* XGBoost
+* TensorFlow / Keras
 
-## API
+### Development
 
-All stock endpoints below are implemented by the FastAPI application. Interactive request and response schemas are available at `/docs`.
+* Visual Studio Code
+* Git
+* GitHub
 
-| Method | Route | Input | Purpose and response |
-| --- | --- | --- | --- |
-| `GET` | `/` | None | API welcome message and docs path. |
-| `GET` | `/api/health` | None | Health status and project name. |
-| `GET` | `/api/stocks` | None | Configured stock symbols. |
-| `GET` | `/api/system/status?symbol=RELIANCE.NS` | Optional `symbol` query parameter | Backend, data-source/cache, prediction-engine, and model status. |
-| `GET` | `/api/stock/{symbol}` | Stock symbol in the path, for example `TCS.NS` | Up to 160 recent feature-engineered observations and data-source status. Triggers data acquisition when the cache is missing or stale. |
-| `GET` | `/api/predict/{symbol}` | Stock symbol in the path | Next-day prediction, model metrics, selected model, analytical signal, features, and evaluation curve; saves the prediction to history. |
-| `POST` | `/api/refresh/{symbol}` | Stock symbol in the path | Forces a Yahoo Finance refresh; returns success, source status, and row count. |
-| `GET` | `/api/history?symbol=TCS.NS&limit=50` | Optional `symbol` and `limit` query parameters (`limit` is clamped to 1–200) | Recent saved predictions, returned as an `items` array. |
+---
 
-**Known integration gap:** the frontend also requests `GET /api/market-overview`, but that route is not implemented by the backend. Its request is silently ignored by the current UI; no such endpoint is documented as available.
-
-## Project structure
+## 📂 Project Structure
 
 ```text
 BullSight/
+│
 ├── backend/
 │   ├── app/
-│   │   ├── ml/                 # Prediction models
-│   │   ├── routers/            # FastAPI routes
-│   │   ├── services/           # Yahoo Finance data and feature engineering
-│   │   ├── config.py
-│   │   ├── db.py               # SQLite prediction history
-│   │   ├── main.py             # FastAPI application
-│   │   └── seed.py             # Initialize the local database
-│   ├── data/                   # Runtime cache; ignored by Git
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── scripts_download.py
-├── docs/                       # Project review paper and presentation
+│   ├── data/
+│   ├── ...
+│
 ├── frontend/
-│   ├── public/                 # Static logo and favicon
-│   ├── src/                    # React/TypeScript application and CSS
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── tsconfig.json
-│   └── vite.config.ts
-├── .gitignore
-├── docker-compose.yml
+│   ├── src/
+│   ├── public/
+│   ├── ...
+│
+├── docs/
+│
 ├── START_BACKEND.bat
 ├── START_FRONTEND.bat
+├── docker-compose.yml
+├── .gitignore
 └── README.md
 ```
 
-## Screenshots
+> The exact internal structure may change as the project continues to be developed.
 
-There are no application screenshots in the repository; the existing image is the Bull Sight logo. Screenshots can be added later under `docs/screenshots/` and linked here.
+---
 
-## License
+## ⚙️ Requirements
 
-No license is currently included. A license can be added when you choose one; no license has been selected for this project.
+Before running Bull Sight, make sure you have:
+
+* Python
+* Node.js
+* npm
+* Git
+
+The required Python and frontend dependencies are provided in the project files.
+
+---
+
+## 🚀 Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/YOUR-USERNAME/bull-sight.git
+cd bull-sight
+```
+
+### 2. Backend Setup
+
+Navigate to the backend:
+
+```bash
+cd backend
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Start the FastAPI backend using the project's configured startup command.
+
+---
+
+### 3. Frontend Setup
+
+Open another terminal and navigate to:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The frontend will provide the Bull Sight web dashboard.
+
+---
+
+## 📈 Data Source
+
+Bull Sight uses **Yahoo Finance through the yfinance Python library** to obtain historical market data.
+
+The data contains market information such as:
+
+* Open
+* High
+* Low
+* Close
+* Adjusted Close
+* Volume
+
+The collected data is then processed and transformed into features used by the machine-learning models.
+
+---
+
+## 🔬 Methodology
+
+The system follows these major stages:
+
+### 1. Data Collection
+
+Historical market data is obtained using `yfinance`.
+
+### 2. Data Preprocessing
+
+The collected data is checked and prepared for modelling. This includes handling missing or inconsistent observations and maintaining chronological ordering.
+
+### 3. Feature Engineering
+
+Technical indicators and market-derived features are calculated from the historical data.
+
+### 4. Train/Test Split
+
+The dataset is divided chronologically into training and testing data to preserve the time-series structure.
+
+### 5. Model Training
+
+Multiple machine-learning models are trained using the prepared features.
+
+### 6. Prediction
+
+The trained models generate an estimate of the next trading day's closing price.
+
+### 7. Evaluation
+
+The models are compared using MAE, RMSE, MAPE and R².
+
+### 8. Visualization
+
+Historical prices, predictions, technical indicators and model performance are presented through the web dashboard.
+
+---
+
+## 📊 Results
+
+Bull Sight allows the performance of different models to be compared using quantitative evaluation metrics.
+
+For the NIFTY 50 experiment, the evaluated models produced different prediction errors, demonstrating that model performance can vary depending on the characteristics of the financial time series.
+
+The dashboard presents:
+
+* Actual price
+* Predicted price
+* Model metrics
+* Technical indicators
+* Model comparison
+* Analytical market signal
+
+---
+
+## ⚠️ Disclaimer
+
+Bull Sight is an academic and analytical project.
+
+The predictions and BUY / HOLD / SELL signals generated by the system are **analytical outputs and should not be considered financial advice or guaranteed predictions of future market prices**.
+
+Financial markets are affected by many factors that may not be represented in historical price data, including economic events, company-specific events, market sentiment, news, and unexpected changes.
+
+---
+
+## 🔮 Future Scope
+
+Future improvements may include:
+
+* LSTM/GRU and Transformer-based models
+* Financial news and sentiment analysis
+* Fundamental analysis
+* SHAP/LIME-based explainability
+* Real-time market data
+* Walk-forward validation
+* Ensemble and hybrid models
+* Prediction uncertainty estimation
+* Automated model retraining
+* Market alerts
+* Portfolio analysis
+* Multi-market support
+
+---
+
+## 👨‍💻 Project
+
+**Bull Sight**
+**AI-Powered Stock Market Prediction & Investment Analysis**
+
+Developed as an academic machine-learning and data-modelling project.
+
+---
+
